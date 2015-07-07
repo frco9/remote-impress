@@ -47,6 +47,13 @@ io.of('/presentation').on('connection', function(socket) {
         socket.emit('previousSlide');
     })
 
+    observer.on('nextItem' + id, function() {
+        socket.emit('nextItem');
+    });
+    observer.on('previousItem' + id, function() {
+        socket.emit('previousItem');
+    })
+
 
     observer.on('disconnect' + id, function() {
 
@@ -58,6 +65,8 @@ io.of('/presentation').on('connection', function(socket) {
         observer.removeAllListeners('takeControl' + id);
         observer.removeAllListeners('next' + id);
         observer.removeAllListeners('previous' + id);
+        observer.removeAllListeners('nextItem' + id);
+        observer.removeAllListeners('previousItem' + id);
         observer.removeAllListeners('disconnect' + id);
         if (remotes[id]) {
             remotes[id].emit('presentationDied');
@@ -81,6 +90,14 @@ io.of('/controller').on('connection', function(socket) {
 
     socket.on('previousSlide', function() {
         observer.emit('previous' + id);
+    });
+
+    socket.on('nextItem', function() {
+        observer.emit('nextItem' + id);
+    });
+
+    socket.on('previousItem', function() {
+        observer.emit('previousItem' + id);
     });
 
     socket.on('disconnect', function() {

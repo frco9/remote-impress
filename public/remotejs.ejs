@@ -5,7 +5,10 @@
      
      socket.on('controllerUrl', function (data) {
          if (presentationIdUrl) data = presentationIdUrl;
-         showQR(data);
+         var isInIframe = (window.location != window.parent.location) ? true : false;
+         if (!isInIframe) {
+            showQR(data);
+         }
          presentationIdUrl = data;
      });
      socket.on('takeControl', function () {
@@ -54,9 +57,24 @@
 
      socket.on('nextSlide', function(){getActions().next()});
      socket.on('previousSlide', function(){getActions().prev()});
+     socket.on('nextItem', function(){
+        var press = jQuery.Event("keypress");
+        press.ctrlKey = false;
+        press.which = 115;
+        $(document).trigger(press);
+     });
+     socket.on('previousItem', function(){
+        var press = jQuery.Event("keypress");
+        press.ctrlKey = false;
+        press.which = 122;
+        $(document).trigger(press);
+     });
 
      socket.on('wheelDown',function(){
+        var isInIframe = (window.location != window.parent.location) ? true : false;
+        if (!isInIframe) {
          showQR(presentationIdUrl);
+        }
      });
 function showQR(data){
          var imgSrc = 'http://chart.apis.google.com/chart?cht=qr&chl=' + data + '&chs=400x400'

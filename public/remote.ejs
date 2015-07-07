@@ -1,12 +1,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <div id="manipulator" style="text-align:center; font-size: 200%;background-color: #ccc; position:
-absolute; top:0;bottom:0;left:0;right:0; padding: 30px;">slide left or right to switch slides</div>
+absolute; top:0;bottom:50%;left:0;right:0; padding: 30px;">slide left or right to switch slides</div>
+
+<div id="manipulator-item" style="text-align:center; font-size: 200%;background-color: rgb(231, 191, 34); position:
+absolute; top:50%;bottom:0;left:0;right:0; padding: 30px;">slide left or right to switch item</div>
 <script>
 
 
 var touchStart = null;
 var touchEnd = null;
+var touchStartItem = null;
+var touchEndItem = null;
 
 var socket = io.connect('<%=host%>/controller');
 socket.emit('takeControl', <%=id%>);
@@ -31,9 +36,9 @@ $(document).on('touchmove', '#manipulator', function (evt) {
     evt.preventDefault();
     touchEnd = evt.originalEvent.touches[0].pageX;
     if (touchStart - touchEnd < 0) {
-        $('#manipulator').html("previous slide");
-    } else {
         $('#manipulator').html("next slide");
+    } else {
+        $('#manipulator').html("previous slide");
     }
 });
 
@@ -42,10 +47,39 @@ $(document).on('touchend', '#manipulator', function (evt) {
     touchEnd = evt.originalEvent.changedTouches[0].pageX;
     if (touchStart - touchEnd < 0) {
         clean();
-        socket.emit('previousSlide', <%= id %> );
+        socket.emit('nextSlide', <%= id %> );
     } else {
         clean();
-        socket.emit('nextSlide', <%= id %> );
+        socket.emit('previousSlide', <%= id %> );
+    }
+});
+
+$(document).on('touchstart', '#manipulator-item', function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    touchStartItem = evt.originalEvent.touches[0].pageX;
+});
+
+$(document).on('touchmove', '#manipulator-item', function (evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    touchEndItem = evt.originalEvent.touches[0].pageX;
+    if (touchStartItem - touchEndItem < 0) {
+        $('#manipulator-item').html("next item");
+    } else {
+        $('#manipulator-item').html("previous item");
+    }
+});
+
+
+$(document).on('touchend', '#manipulator-item', function (evt) {
+    touchEndItem = evt.originalEvent.changedTouches[0].pageX;
+    if (touchStartItem - touchEndItem < 0) {
+        clean();
+        socket.emit('nextItem', <%= id %> );
+    } else {
+        clean();
+        socket.emit('previousItem', <%= id %> );
     }
 });
 </script>
